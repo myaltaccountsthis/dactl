@@ -27,8 +27,7 @@ struct CentroidDecomp {
 
 	int getSize(int node, int parent = -1) {
 		subsz[node] = 1;
-		for (int adj : adjList[node]) {	// normal
-		// for (auto [adj, weight] : adjList[node]) {	// weighted
+		for (int adj : adjList[node]) {
 			if (removed[adj] || adj == parent)
 				continue;
 			subsz[node] += getSize(adj, node);
@@ -37,8 +36,7 @@ struct CentroidDecomp {
 	}
 
 	int getCentroid(int node, int tsz, int parent = -1) {
-		for (int adj : adjList[node]) {	// normal
-		// for (auto [adj, weight] : adjList[node]) {	// weighted
+		for (int adj : adjList[node]) {
 			if (removed[adj] || adj == parent)
 				continue;
 			if (subsz[adj] * 2 > tsz)
@@ -51,8 +49,7 @@ struct CentroidDecomp {
 		if (dist > k)	// k2 if [k1, k2]
 			return;
 		distances.push_back(dist);
-		// for (auto [adj, weight] : adjList[node]) {	// weighted
-		for (int adj : adjList[node]) {	// normal
+		for (int adj : adjList[node]) {
 			if (removed[adj] || adj == parent)
 				continue;
 			// getBest(adj, node, make_pair(dist.first + 1, dist.second + weight), distances);	// weighted
@@ -68,19 +65,17 @@ struct CentroidDecomp {
 		// vector<ll> best(size, -1e18);	// weighted
 		// best[0] = 0;
 
-		// for (auto [adj, weight] : adjList[centroid]) {	// weighted
 		for (int adj : adjList[centroid]) {	// normal
 			if (removed[adj])
 				continue;
 			
 			vector<E> distances;
 			distances.reserve(subsz[adj]);
-			// getBest(adj, centroid, make_pair(1, weight), distances); // weighted
 			getBest(adj, centroid, 1, distances); // normal
+			// getBest(adj, centroid, make_pair(1, weight), distances); // weighted
 			
 			// IMPL merge step - first find paths with other centroids
 			// then update best/count among centroids already seen
-
 			// normal
 			for (int dist : distances) {
 				if (k - dist >= 0 && k - dist < size)
@@ -89,7 +84,6 @@ struct CentroidDecomp {
 			for (int dist : distances) {
 				allDistances[dist]++;
 			}
-		
 			// maximum weight for path length k
 			// for (auto [dist, total] : distances) {
 			// 	if (k - dist >= 0 && k - dist < size)
@@ -98,7 +92,6 @@ struct CentroidDecomp {
 			// for (auto [dist, total] : distances) {
 			// 	best[dist] = max(best[dist], total);
 			// }
-
 			// fixed length paths 2
 			// for (int dist : distances) {
 			// 	ans += fenwick.query(min(size - 1, k2 - dist)) - fenwick.query(min(size - 1, k1 - dist) - 1);
@@ -115,7 +108,6 @@ struct CentroidDecomp {
 		processCentroid(centroid, size);
 
 		removed[centroid] = true;
-		// for (auto [adj, weight] : adjList[centroid]) {	// weighted
 		for (int adj : adjList[centroid]) {	// normal
 			if (removed[adj])
 				continue;
