@@ -40,19 +40,14 @@ public:
 			int sz = tr - tl + 1;
 			// IMPL
 			// range updates and sums
-			// if (upd.second) {
-			// 	tree[i] = upd.second * sz;
-			// 	marked[i] = upd;
-			// }
-			// else {
-			// 	tree[i] += upd.first * sz;
-			// 	marked[i].first += upd.first;
-			// }
-
-			// polynomial queries
-			// tree[i] += sz * upd.first + tri(sz) * upd.second;
-			// marked[i].first += upd.first;
-			// marked[i].second += upd.second;
+			if (upd.second) {
+				tree[i] = upd.second * sz;
+				marked[i] = upd;
+			}
+			else {
+				tree[i] += upd.first * sz;
+				marked[i].first += upd.first;
+			}
 		}
 		else {
 			int tm = tl + tr >> 1;
@@ -83,24 +78,18 @@ public:
 	void push(int i, int sz1, int sz2) {
 		// IMPL
 		// range updates and sums
-		// if (marked[i].second) {
-		// 	tree[i << 1] = marked[i].second * sz1;
-		// 	tree[i << 1 | 1] = marked[i].second * sz2;
-		// 	marked[i << 1] = marked[i << 1 | 1] = {0, marked[i].second};
-		// }
-		// if (marked[i].first) {
-		// 	tree[i << 1] += marked[i].first * sz1;
-		// 	tree[i << 1 | 1] += marked[i].first * sz2;
-		// 	marked[i << 1].first += marked[i].first;
-		// 	marked[i << 1 | 1].first += marked[i].first;
-		// }
-		// marked[i] = {};
-	
-		// polynomial queries
-		// tree[i << 1] += marked[i] * sz1
-		// tree[i << 1 | 1] += marked[i] * sz2
-		// marked[i << 1] += marked[i]
-		// marked[i << 1 | 1] += marked[i]
+		if (marked[i].second) {
+			tree[i << 1] = marked[i].second * sz1;
+			tree[i << 1 | 1] = marked[i].second * sz2;
+			marked[i << 1] = marked[i << 1 | 1] = {0, marked[i].second};
+		}
+		if (marked[i].first) {
+			tree[i << 1] += marked[i].first * sz1;
+			tree[i << 1 | 1] += marked[i].first * sz2;
+			marked[i << 1].first += marked[i].first;
+			marked[i << 1 | 1].first += marked[i].first;
+		}
+		marked[i] = {};
 	}
 
 	// Segment Tree Walk for O(n log n) binary search

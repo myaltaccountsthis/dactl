@@ -28,89 +28,52 @@ struct CentroidDecomp {
 	int getSize(int node, int parent = -1) {
 		subsz[node] = 1;
 		for (int adj : adjList[node]) {
-			if (removed[adj] || adj == parent)
-				continue;
+			if (removed[adj] || adj == parent) continue;
 			subsz[node] += getSize(adj, node);
 		}
 		return subsz[node];
 	}
-
 	int getCentroid(int node, int tsz, int parent = -1) {
 		for (int adj : adjList[node]) {
-			if (removed[adj] || adj == parent)
-				continue;
-			if (subsz[adj] * 2 > tsz)
-				return getCentroid(adj, tsz, node);
+			if (removed[adj] || adj == parent) continue;
+			if (subsz[adj] * 2 > tsz) return getCentroid(adj, tsz, node);
 		}
 		return node;
 	}
-
 	void getBest(int node, int parent, E dist, vector<E>& distances) {
 		if (dist > k)	// k2 if [k1, k2]
 			return;
 		distances.push_back(dist);
 		for (int adj : adjList[node]) {
-			if (removed[adj] || adj == parent)
-				continue;
-			// getBest(adj, node, make_pair(dist.first + 1, dist.second + weight), distances);	// weighted
+			if (removed[adj] || adj == parent) continue;
 			getBest(adj, node, dist + 1, distances);	// normal
 		}
 	}
 
 	void processCentroid(int centroid, int size) {
-		vector<ll> allDistances(size);	// normal
+		vector<ll> allDistances(size);	// normal, do max() or fenwick for weighted
 		allDistances[0] = 1;
-		// FenwickTree fenwick(size); // fixed length paths 2
-		// fenwick.add(0, 1);
-		// vector<ll> best(size, -1e18);	// weighted
-		// best[0] = 0;
-
 		for (int adj : adjList[centroid]) {	// normal
-			if (removed[adj])
-				continue;
-			
+			if (removed[adj]) continue;
 			vector<E> distances;
 			distances.reserve(subsz[adj]);
 			getBest(adj, centroid, 1, distances); // normal
-			// getBest(adj, centroid, make_pair(1, weight), distances); // weighted
-			
-			// IMPL merge step - first find paths with other centroids
-			// then update best/count among centroids already seen
-			// normal
-			for (int dist : distances) {
+			for (int dist : distances) {	// first find paths with other centroids
 				if (k - dist >= 0 && k - dist < size)
 					ans += allDistances[k - dist];
 			}
-			for (int dist : distances) {
+			for (int dist : distances) {	// then add new paths to array
 				allDistances[dist]++;
 			}
-			// maximum weight for path length k
-			// for (auto [dist, total] : distances) {
-			// 	if (k - dist >= 0 && k - dist < size)
-			// 		ans = max(ans, total + best[k - dist]);
-			// }
-			// for (auto [dist, total] : distances) {
-			// 	best[dist] = max(best[dist], total);
-			// }
-			// fixed length paths 2
-			// for (int dist : distances) {
-			// 	ans += fenwick.query(min(size - 1, k2 - dist)) - fenwick.query(min(size - 1, k1 - dist) - 1);
-			// }
-			// for (int dist : distances) {
-			// 	fenwick.add(dist, 1);
-			// }
 		}
 	}
-
 	void decompose(int node) {
 		int size = getSize(node);
 		int centroid = getCentroid(node, size);
 		processCentroid(centroid, size);
-
 		removed[centroid] = true;
 		for (int adj : adjList[centroid]) {	// normal
-			if (removed[adj])
-				continue;
+			if (removed[adj]) continue;
 			decompose(adj);
 		}
 	}
